@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Think You're Good?</title>
+
+    <style>
+        /* 1. Remove default browser spacing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 2. Page background */
+        body {
+            background: #eeeeee;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 3. Main card */
+        .card {
+            width: 260px;
+            height: 450px;
+            flex-shrink: 0;
+
+            background: black;
+            border-radius: 20px;
+            padding: 18px 14px;
+            box-sizing: border-box;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 4. Heading */
+        h1 {
+            color: white;
+            font-size: 38px;
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        h1 span {
+            color: red;
+        }
+
+        /* 5. Flower illustration */
+        .flower {
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flower img {
+            width: 700px;
+            height: 500px;
+            object-fit: contain;
+        }
+
+        /* 6. Bottom content */
+        .bottom {
+            margin-top: auto;
+            text-align: center;
+            padding-bottom: 45px;
+        }
+
+        .status-button {
+            background: #680700;
+            color: white;
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-size: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .description {
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .description span {
+            color: red;
+        }
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            width: 100%;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h1>
+            THINK<br>
+            YOU'RE<br>
+            <span>GOOD?</span>
+        </h1>
+
+        <div class="flower">
+            <!-- Replace this with your flower image -->
+            <img src="images/katana.png" alt="Purple flower branch">
+        </div>
+
+        <div class="bottom">
+
+            <a href="findout.html" class="status-button">
+                CHECK YOUR STATUS
+            </a>
+
+            <p class="description">
+                Discover your strengths.<br>
+                <span>Expose your weaknesses.</span>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
