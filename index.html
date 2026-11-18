@@ -38,6 +38,7 @@
 
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         /* 4. Heading */
@@ -107,6 +108,32 @@
             align-items: center;
             font-family: Arial, sans-serif;
         }
+        footer {
+            position: absolute;
+            bottom: 14px;
+            left: 0;
+            width: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+
+            font-size: 9px;
+        }
+
+        footer a {
+            color: #999999;
+            text-decoration: none;
+        }
+
+        footer span {
+            color: #555555;
+        }
+
+        footer a:hover {
+            color: #ff3030;
+        }
     </style>
 </head>
 
@@ -137,6 +164,11 @@
             </p>
 
         </div>
+        <footer>
+            <a href="privacy.html">Privacy Policy</a>
+                <span>|</span>
+            <a href="terms.html">Terms of Service</a>
+        </footer>
 
     </div>
 
