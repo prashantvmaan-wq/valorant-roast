@@ -1,4 +1,4 @@
-
+const API_BASE_URL = "https://valorant-roast.onrender.com";
 const searchButton = document.getElementById("searchButton");
 
 if (searchButton) {
@@ -59,7 +59,7 @@ async function loadPlayerStats() {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:8000/api/player/${encodeURIComponent(riotId)}`
+            `${API_BASE_URL}/api/player/${encodeURIComponent(riotId)}`
         );
 
         if (!response.ok) {
@@ -122,7 +122,7 @@ async function loadWeaponStats() {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:8000/api/weapon/${encodeURIComponent(riotId)}`
+            `${API_BASE_URL}/api/weapon/${encodeURIComponent(riotId)}`
         );
 
         if (!response.ok) {
