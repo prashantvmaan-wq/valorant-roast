@@ -73,15 +73,7 @@ h1 span {
     color: white;
     font-size: 9px;
 }
-.agent-image {
-    position: absolute;
-    width: 76px;
-    height: 180px;
-    object-fit: contain;
-    object-position: bottom;
-    right: 5px;
-    bottom: 0;
-}
+
 .weapon-image {
     position: absolute;
 

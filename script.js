@@ -1,4 +1,11 @@
+
 const API_BASE_URL = "https://valorant-roast.onrender.com";
+
+
+// ==================================
+// 1. RIOT ID SUBMISSION
+// ==================================
+
 const searchButton = document.getElementById("searchButton");
 
 if (searchButton) {
@@ -8,7 +15,7 @@ if (searchButton) {
         const riotId = document.getElementById("riotId").value.trim();
         const tagline = document.getElementById("tagline").value.trim();
 
-        if (riotId === "" || tagline === "") {
+        if (!riotId || !tagline) {
             alert("Please enter both Riot ID and Tagline!");
             return;
         }
@@ -22,7 +29,7 @@ if (searchButton) {
 
 
 // ==================================
-// 2. DISPLAY PLAYER NAME AND TAGLINE
+// 2. DISPLAY PLAYER INFORMATION
 // ==================================
 
 const displayName = document.getElementById("displayName");
@@ -36,30 +43,34 @@ if (displayName) {
 
     document.getElementById("displayTag").textContent =
         tagline ? "#" + tagline : "";
+
 }
 
 
 // ==================================
-// 3. FETCH PLAYER STATS FROM FASTAPI
+// 3. FETCH REAL PLAYER STATS AND ROAST
 // ==================================
 
 async function loadPlayerStats() {
 
-    const rankElement = document.getElementById("rank");
+    const roastElement = document.getElementById("roast");
 
-    if (!rankElement) return;
+    if (!roastElement) return;
 
     const riotId = sessionStorage.getItem("riotId");
+    const tagline = sessionStorage.getItem("tagline");
 
-    if (!riotId) {
+    if (!riotId || !tagline) {
         alert("Player information not found!");
         return;
     }
 
     try {
 
+        roastElement.textContent = "GENERATING YOUR ROAST...";
+
         const response = await fetch(
-            `${API_BASE_URL}/api/player/${encodeURIComponent(riotId)}`
+            `${API_BASE_URL}/roast/${encodeURIComponent(riotId)}/${encodeURIComponent(tagline)}`
         );
 
         if (!response.ok) {
@@ -68,102 +79,46 @@ async function loadPlayerStats() {
 
         const data = await response.json();
 
-        document.getElementById("rank").textContent = data.rank;
-        document.getElementById("winRate").textContent = data.win_rate;
-        document.getElementById("kd").textContent = data.kd;
-        document.getElementById("headshot").textContent = data.headshot;
+        const stats = data.stats;
 
-        // Generate player verdict
+        // Display player information
 
-        const verdictElement = document.querySelector(".verdict p");
+        document.getElementById("agent").textContent =
+            "AGENT: " + data.agent;
 
-        if (data.kd < 0.5) {
-            verdictElement.textContent =
-                "Even the bots are questioning your aim.";
-        }
-        else if (data.kd < 1.0) {
-            verdictElement.textContent =
-                "You are donating kills more than collecting them.";
-        }
-        else if (data.kd < 1.5) {
-            verdictElement.textContent =
-                "Not bad. Occasionally, you remember how to aim.";
-        }
-        else {
-            verdictElement.textContent =
-                "Your opponents should consider uninstalling.";
-        }
+        document.getElementById("kills").textContent =
+            stats.kills;
+
+        document.getElementById("deaths").textContent =
+            stats.deaths;
+
+        document.getElementById("assists").textContent =
+            stats.assists;
+
+        document.getElementById("kd").textContent =
+            stats.kd_ratio;
+
+        document.getElementById("headshot").textContent =
+            stats.headshot_percentage + "%";
+
+        document.getElementById("acs").textContent =
+            stats.acs;
+
+        // Display actual backend-generated roast
+
+        roastElement.textContent = data.roast;
 
     }
     catch (error) {
 
         console.error("Error:", error);
-        alert("Unable to load player statistics. Check your backend.");
+
+        roastElement.textContent =
+            "Unable to generate roast. Please try again.";
+
+        alert("Unable to load player data. Check your backend.");
 
     }
 }
 
 loadPlayerStats();
-
-
-// ==================================
-// 4. WEAPON ROAST SAMPLE DATA
-// ==================================
-
-
-async function loadWeaponStats() {
-
-    const weaponElement = document.getElementById("weaponHeadshot");
-
-    if (!weaponElement) return;
-
-    const riotId = sessionStorage.getItem("riotId");
-
-    try {
-
-        const response = await fetch(
-            `${API_BASE_URL}/api/weapon/${encodeURIComponent(riotId)}`
-        );
-
-        if (!response.ok) {
-            throw new Error("Could not fetch weapon statistics");
-        }
-
-        const data = await response.json();
-
-        // Display weapon statistics
-        document.getElementById("weaponHeadshot").textContent = data.headshot;
-        document.getElementById("accuracy").textContent = data.accuracy;
-        document.getElementById("worstWeapon").textContent = data.worst_weapon;
-        document.getElementById("bodyShots").textContent = data.body_shots;
-
-        // Generate weapon roast
-        const verdict = document.querySelector(".verdict p");
-
-        const headshot = parseFloat(data.headshot);
-
-        if (headshot < 10) {
-            verdict.textContent =
-                "Are you aiming for the enemy or the ceiling?";
-        }
-        else if (headshot < 20) {
-            verdict.textContent =
-                "Your bullets know the body better than the head.";
-        }
-        else if (headshot < 35) {
-            verdict.textContent =
-                "Decent aim. Don't get too confident.";
-        }
-        else {
-            verdict.textContent =
-                "Those headshots are making people uninstall.";
-        }
-
-    }
-    catch (error) {
-        console.error("Weapon API Error:", error);
-        alert("Unable to load weapon statistics.");
-    }
-}
-
-loadWeaponStats();
