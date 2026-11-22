@@ -72,6 +72,104 @@ def calculate_match_stats(match, player_name, player_tag):
         "result": "Win" if won else "Loss"
     }
 
+def calculate_weapon_stats(match, player_name, player_tag):
+
+    # Find the player in the match
+    players = match["players"]["all_players"]
+
+    player = next(
+        (
+            p for p in players
+            if p["name"].lower() == player_name.lower()
+            and p["tag"].lower() == player_tag.lower()
+        ),
+        None
+    )
+
+    if player is None:
+        return {"error": "Player not found in this match"}
+
+    player_puuid = player["puuid"]
+
+    # Variables to store total statistics
+    headshots = 0
+    bodyshots = 0
+    legshots = 0
+
+    weapon_kills = {}
+
+    # Go through every round
+    for round_data in match.get("rounds", []):
+
+        for round_player in round_data.get("player_stats", []):
+
+            # Process only the requested player's statistics
+            if round_player.get("player_puuid") != player_puuid:
+                continue
+
+            headshots += round_player.get("headshots", 0)
+            bodyshots += round_player.get("bodyshots", 0)
+            legshots += round_player.get("legshots", 0)
+
+            # Count kills using each weapon
+            for kill in round_player.get("kill_events", []):
+
+                if kill.get("killer_puuid") != player_puuid:
+                    continue
+
+                weapon = kill.get("damage_weapon_name")
+
+                if weapon:
+                    weapon_kills[weapon] = weapon_kills.get(weapon, 0) + 1
+
+    # Calculate headshot percentage
+    total_shots = headshots + bodyshots + legshots
+
+    hs_percentage = (
+        (headshots / total_shots) * 100
+        if total_shots > 0 else 0
+    )
+
+    # Find the weapon with the fewest kills
+    worst_weapon = (
+        min(weapon_kills, key=weapon_kills.get)
+        if weapon_kills else "N/A"
+    )
+
+    return {
+        "player": player["name"],
+        "headshot_percentage": round(hs_percentage, 2),
+        "weapon_kills": sum(weapon_kills.values()),
+        "worst_weapon": worst_weapon,
+        "body_shots": bodyshots
+    }
+
+
+def generate_weapon_verdict(stats):
+
+    hs = stats["headshot_percentage"]
+    kills = stats["weapon_kills"]
+    worst_weapon = stats["worst_weapon"]
+    body_shots = stats["body_shots"]
+
+    if kills >= 30 and hs >= 40:
+        return "Deadly aim! The enemy team needs a refund."
+
+    elif kills >= 20 and hs >= 30:
+        return f"Solid performance! But that {worst_weapon} needs some attention."
+
+    elif hs >= 50:
+        return "Your aim is sharp! Even the walls aren't safe."
+
+    elif body_shots > 50:
+        return "Stop aiming for the body! Their heads are right there."
+
+    elif kills < 10:
+        return "Were you playing VALORANT or sightseeing?"
+
+    else:
+        return f"{worst_weapon} is not your weapon. Please return it."
+
 
 def generate_roast(stats):
 
@@ -327,3 +425,40 @@ def get_player_roast(name: str, tag: str):
         "stats": stats,
         "roast": roast
     }
+
+# --------------------------------
+# 10. Get Player Weapon Statistics
+# --------------------------------
+
+@app.get("/weapon-stats/{name}/{tag}")
+def get_weapon_stats(name: str, tag: str):
+
+    # Get player's latest competitive match
+    match_data = get_match_history(name, tag)
+
+    matches = match_data.get("data", [])
+
+    if not matches:
+        raise HTTPException(
+            status_code=404,
+            detail="No competitive matches found"
+        )
+
+    # Calculate weapon statistics
+    result = calculate_weapon_stats(
+        matches[0],
+        name,
+        tag
+    )
+
+    if "error" in result:
+        raise HTTPException(
+            status_code=404,
+            detail=result["error"]
+        )
+
+    verdict = generate_weapon_verdict(result)
+    return {
+            **result,
+            "verdict": verdict
+        }

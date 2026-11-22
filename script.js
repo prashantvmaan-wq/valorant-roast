@@ -1,7 +1,6 @@
 
 const API_BASE_URL = "https://valorant-roast.onrender.com";
 
-
 // ==================================
 // 1. RIOT ID SUBMISSION
 // ==================================
@@ -122,3 +121,66 @@ async function loadPlayerStats() {
 }
 
 loadPlayerStats();
+
+// ==================================
+// 4. FETCH WEAPON STATISTICS
+// ==================================
+
+async function loadWeaponStats() {
+    console.log("Weapon page JavaScript is running!");
+
+    const weaponHeadshot = document.getElementById("weaponHeadshot");
+    console.log("Weapon element found:", weaponHeadshot);
+    // Run only on the weapon page
+    if (!weaponHeadshot) return;
+
+    const riotId = sessionStorage.getItem("riotId");
+    const tagline = sessionStorage.getItem("tagline");
+    console.log("Riot ID:", riotId);
+    console.log("Tagline:", tagline);
+    if (!riotId || !tagline) {
+        alert("Player information not found!");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/weapon-stats/${encodeURIComponent(riotId)}/${encodeURIComponent(tagline)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Could not fetch weapon statistics");
+        }
+
+        const data = await response.json();
+        console.log("Weapon API response:", data);
+        console.log("Verdict received:", data.verdict);
+
+        // Display weapon statistics
+
+        document.getElementById("weaponHeadshot").textContent =
+            data.headshot_percentage + "%";
+
+        document.getElementById("weaponKills").textContent =
+            data.weapon_kills;
+
+        document.getElementById("worstWeapon").textContent =
+            data.worst_weapon;
+
+        document.getElementById("bodyShots").textContent =
+            data.body_shots;
+        document.getElementById("weaponVerdict").textContent =
+            data.verdict;
+
+    }
+    catch (error) {
+
+        console.error("Weapon Stats Error:", error);
+
+        alert("Unable to load weapon statistics. Please try again.");
+
+    }
+}
+
+loadWeaponStats();
